@@ -1,0 +1,7 @@
+{
+    admin off
+}
+
+api.cheapcheap.kz {
+    reverse_proxy web:8080
+}

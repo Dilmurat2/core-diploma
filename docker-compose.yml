@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    networks:
+      - app_network
+    expose:
+      - "8080"  # Открываем порт внутри сети Docker для Caddy
+
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile  # монтируем Caddyfile
+      - caddy_data:/data  # папка для хранения данных Caddy
+      - caddy_config:/config  # папка для конфигурации Caddy
+    depends_on:
+      - web  # caddy зависит от web-сервиса
+    networks:
+      - app_network  # подключаем к той же сети, чтобы Caddy мог проксировать запросы
+    environment:
+      - CADDY_ADDR=:443
+
+networks:
+  app_network:
+    driver: bridge  # стандартный драйвер сети Docker
+
+volumes:
+  caddy_data:
+  caddy_config:
